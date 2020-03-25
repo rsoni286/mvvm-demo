@@ -1,16 +1,18 @@
-package com.delta.mvvm1;
-
-import androidx.appcompat.app.AppCompatActivity;
+package com.delta.mvvm1.view.activities;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+
+import com.delta.mvvm1.R;
 import com.delta.mvvm1.model.AnalyticsCounterResponseModel;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.delta.mvvm1.viewmodel.AnalyticsViewModel;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -25,14 +27,51 @@ public class MainActivity extends BaseActivity {
             tvCollectionAmountCleared, tvExpenseReported, tvPresentDays, tvLeaves, tvScheduledEffectiveCalls,
             tvUnscheduledEffectiveCalls, tvTotalEffectiveCalls, tvTargetVisits, tvAverageDailyWorkingHour;
 
-    AnalyticsCounterResponseModel.Data dataList;
+
+    AnalyticsViewModel analyticsViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         initView();
+        analyticsViewModel = new ViewModelProvider(this).get(AnalyticsViewModel.class);
+        analyticsViewModel.init(sbAppInterface);
+
+        analyticsViewModel.getStatus().observe(this, status -> {
+            if (status != null)
+                switch (status) {
+                    case 0:
+                        showInProgress();
+                        break;
+                    case 1:
+                    case -1:
+                        hideInProgress();
+                        break;
+                }
+        });
+
+
+        analyticsViewModel.getErrorMessage().observe(this, error -> {
+            if (error != null) {
+                commonUtils.snackbar(llLayout, error);
+            }
+
+        });
+
+        analyticsViewModel.getDataList().observe(this, dataList -> {
+            if (dataList != null) {
+                setData(dataList);
+            }
+        });
+    }
+
+    private void hideInProgress() {
+        commonUtils.dismissCustomDialog(dialog);
+    }
+
+    private void showInProgress() {
+        commonUtils.showCustomDialog(dialog, this);
     }
 
     private void initView() {
@@ -56,11 +95,24 @@ public class MainActivity extends BaseActivity {
         tvTargetVisits = findViewById(R.id.tvTargetVisits);
         tvAverageDailyWorkingHour = findViewById(R.id.tvAverageDailyWorkingHour);
 
-        getDataFromServer();
 
     }
 
-    private void getDataFromServer() {
+    private void setData(AnalyticsCounterResponseModel.Data dataList) {
+        tvTotalOrders.setText(dataList.getTotalOrders() + "");
+        tvTotalZeroOrders.setText(dataList.getTotalZeroOrders() + "");
+        tvTotalOrderValue.setText(dataList.getTotalOrderValue() + "");
+        tvCollectionAmountPending.setText(dataList.getTotalPendingCollectionAmount() + "");
+        tvCollectionAmountCleared.setText(dataList.getTotalClearedCollectionAmount() + "");
+        tvExpenseReported.setText(dataList.getTotalExpense() + "");
+        tvPresentDays.setText(dataList.getPresentDays() + "");
+        tvLeaves.setText(dataList.getLeaves() + "");
+        tvScheduledEffectiveCalls.setText(dataList.getScheduledEffectiveCalls() + "");
+        tvUnscheduledEffectiveCalls.setText(dataList.getUnscheduledEffectiveCalls() + "");
+    }
+
+    // we are calling this inside analticsRepository
+   /* private void getDataFromServer() {
         if (commonUtils.isNetworkAvailable()) {
             commonUtils.showCustomDialog(dialog, this);
 
@@ -75,16 +127,16 @@ public class MainActivity extends BaseActivity {
                         if (model != null) {
                             if (model.getSuccess()) {
                                 dataList = model.getData();
-                                tvTotalOrders.setText(dataList.getTotalOrders()+"");
-                                tvTotalZeroOrders.setText(dataList.getTotalZeroOrders()+"");
-                                tvTotalOrderValue.setText(dataList.getTotalOrderValue()+"");
-                                tvCollectionAmountPending.setText(dataList.getTotalPendingCollectionAmount()+"");
-                                tvCollectionAmountCleared.setText(dataList.getTotalClearedCollectionAmount()+"");
-                                tvExpenseReported.setText(dataList.getTotalExpense()+"");
-                                tvPresentDays.setText(dataList.getPresentDays()+"");
-                                tvLeaves.setText(dataList.getLeaves()+"");
-                                tvScheduledEffectiveCalls.setText(dataList.getScheduledEffectiveCalls()+"");
-                                tvUnscheduledEffectiveCalls.setText(dataList.getUnscheduledEffectiveCalls()+"");
+                                tvTotalOrders.setText(dataList.getTotalOrders() + "");
+                                tvTotalZeroOrders.setText(dataList.getTotalZeroOrders() + "");
+                                tvTotalOrderValue.setText(dataList.getTotalOrderValue() + "");
+                                tvCollectionAmountPending.setText(dataList.getTotalPendingCollectionAmount() + "");
+                                tvCollectionAmountCleared.setText(dataList.getTotalClearedCollectionAmount() + "");
+                                tvExpenseReported.setText(dataList.getTotalExpense() + "");
+                                tvPresentDays.setText(dataList.getPresentDays() + "");
+                                tvLeaves.setText(dataList.getLeaves() + "");
+                                tvScheduledEffectiveCalls.setText(dataList.getScheduledEffectiveCalls() + "");
+                                tvUnscheduledEffectiveCalls.setText(dataList.getUnscheduledEffectiveCalls() + "");
 
 
                             } else {
@@ -103,5 +155,5 @@ public class MainActivity extends BaseActivity {
         } else {
             commonUtils.internetConnectionSnackbar(llLayout);
         }
-    }
+    }*/
 }

@@ -2,7 +2,7 @@ package com.delta.mvvm1.dagger.component;
 
 
 import com.delta.mvvm1.AbstractFragment;
-import com.delta.mvvm1.BaseActivity;
+import com.delta.mvvm1.view.activities.BaseActivity;
 import com.delta.mvvm1.dagger.module.APIModule;
 import com.delta.mvvm1.dagger.module.AppModule;
 import com.delta.mvvm1.dagger.module.NetModule;

@@ -1,4 +1,4 @@
-package com.delta.mvvm1;
+package com.delta.mvvm1.view.activities;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.delta.mvvm1.SBApp;
 import com.delta.mvvm1.global.CommonUtils;
 import com.delta.mvvm1.global.KeyboardWatcher;
 import com.delta.mvvm1.global.SharedPref;
